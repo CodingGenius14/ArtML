@@ -1,198 +1,122 @@
-# Translating Musical Emotion into Visual Form
-### An Iterative NLP and Generative AI Pipeline for Lyric-to-Album-Cover Synthesis
+# Lyric-to-Album-Cover: Modular NLP + Diffusion Pipeline
 
+Code and evaluation artifacts for the paper:
+
+> *When NLP Meets Lyrics: Characterizing Domain-Shift Failures in Affective
+> Text Analysis and a Modular Framework for Lyric-Conditioned Visual Synthesis*
+> Anonymous Authors — Under Review, NeurIPS 2026
 
 ---
 
 ## Overview
 
-This repository contains the full implementation of an end-to-end pipeline that automatically generates album cover artwork from song lyrics using NLP and text-to-image diffusion models.
+An end-to-end pipeline that takes song lyrics as input and generates album
+cover artwork via five sequential stages:
 
-The pipeline runs in five sequential stages:
-
-```
-Raw Lyrics → Preprocessing → Keyword Extraction → Emotion Classification → Prompt Engineering → Image Generation
-```
-
-Two program iterations are included:
-- **Program 1** (`main.ipynb`, `improved_main.ipynb`): Stable Diffusion v1.5, produces V1–V4
-- **Program 2** (`final_implementation.ipynb`): Stable Diffusion XL, produces V5 with genre-aware prompt construction
+1. **Lyric preprocessing** — custom emotion-aware stopword filtering + WordNet lemmatization  
+2. **Keyword extraction** — hybrid TF-IDF + emotion-boosted frequency scoring  
+3. **Emotion classification** — j-hartmann/emotion-english-distilroberta-base  
+4. **Prompt engineering** — V1–V5 narrative templates with palette mapping and genre-aware override  
+5. **Image generation** — Stable Diffusion v1.5 (V1–V4) and SDXL (V5)
 
 ---
 
-## Key Findings
-
-| Finding | Detail |
-|---|---|
-| Standard NLP stopwords destroy lyric signal | NLTK removes emotionally critical tokens like `dark`, `lost`, `pain`, `cry` |
-| RAKE fails on lyrics | Phrase-level scoring misses single-word emotional anchors; TF-IDF + boosting adopted |
-| Hip-hop misclassification | `j-hartmann` DistilRoBERTa predicts `fear` (0.331 confidence) for rap ambition lyrics |
-| Prompt engineering dominates | 65-word V4 narrative template outperforms 20-word baseline on identical model weights |
-| SDXL eliminates most text hallucinations | SD v1.5 hallucinated garbled text in nearly all outputs; SDXL substantially reduces this |
-
-**Human evaluation (n=21):**
-
-| Genre | Mean Preference (1–5) | % Preferring V5 |
-|---|---|---|
-| Rap / Ambition | 4.00 ± 1.58 | **66.7%** |
-| Upbeat Pop | 3.81 ± 1.25 | **38.1%** |
-| Sad / Introspective | 2.71 ± 1.65 | 28.6% |
+## Repo Structure
+├── program1/               # SD v1.5 pipeline (produces V1–V4)
+├── program2/               # SDXL pipeline with genre-aware override (produces V5)
+├── evaluation/
+│   ├── clip_eval.ipynb     # CLIP-prompt and CLIP-lyric scoring
+│   └── human_study/        # Preference data (CSV) and analysis scripts
+├── outputs/
+│   ├── rap/                # Generated images V1–V5, rap genre
+│   ├── sad/                # Generated images V1–V5, sad/introspective genre
+│   └── pop/                # Generated images V1–V5, upbeat pop genre
+└── figures/                # All paper figures (PDF + PNG)
 
 ---
 
-## Repository Structure
+## Requirements
+torch
+transformers
+diffusers
+accelerate
+Pillow
+nltk
+scikit-learn
+numpy
+pandas
+matplotlib
 
-```
-ArtML/
-├── main.ipynb                  # Program 1 baseline (V1 outputs)
-├── improved_main.ipynb         # Program 1 improved (V2–V4 outputs)
-├── final_implementation.ipynb  # Program 2 — SDXL + genre-aware prompts (V5 outputs)
-├── requirements.txt            # Full dependency list
-├── generated_outputs/          # All 15 generated album covers (V1–V5, 3 genres)
-└── album_cover.png             # Sample output
-```
-
----
-
-## Setup
-
-### Prerequisites
-
-- Python 3.9+
-- A HuggingFace account and access token (for SDXL in `final_implementation.ipynb`)
-- **GPU strongly recommended for Program 2 (SDXL).** CPU-only generation takes 5–25 minutes per image on SD v1.5 and is impractical for SDXL.
-
-### Install dependencies
+Install with:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-You will also need NLTK data:
+NLTK resources needed:
 
 ```python
 import nltk
-nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
+nltk.download('punkt')
 ```
 
-### HuggingFace token (required for SDXL)
+---
+
+## Reproducing the Main Results
+
+**Generate images (Program 1 — SD v1.5, V1–V4):**
 
 ```bash
-huggingface-cli login
+cd program1
+python generate.py --genre sad --version v4 --seed 42
 ```
 
-Or set the environment variable:
+**Generate images (Program 2 — SDXL, V5):**
 
 ```bash
-export HF_TOKEN=your_token_here
+cd program2
+python generate_sdxl.py --genre rap --seed 42
 ```
+
+All experiments use `--seed 42` throughout. V1–V4 run on CPU (no GPU required,
+~15 min/image). V5 requires a GPU with ≥16GB VRAM.
+
+**CLIP evaluation:**
+
+```bash
+cd evaluation
+jupyter nbconvert --to notebook --execute clip_eval.ipynb
+```
+
+Scores are written to `evaluation/clip_scores.csv` and match Table 6 in the paper.
 
 ---
 
-## Usage
+## Human Preference Data
 
-### Program 1 — SD v1.5 (V1–V4)
-
-Open and run `improved_main.ipynb` end-to-end. This notebook:
-1. Accepts raw lyric text input
-2. Applies custom emotion-aware preprocessing and lemmatization
-3. Runs TF-IDF + emotion-boosted keyword extraction
-4. Classifies emotion via `j-hartmann/emotion-english-distilroberta-base`
-5. Constructs a V4 narrative prompt
-6. Generates a 512×512 album cover via Stable Diffusion v1.5
-
-```python
-# Set your lyrics here (top of notebook)
-lyrics = """
-[Verse 1]
-Your lyrics here...
-"""
-```
-
-### Program 2 — SDXL + Genre-Aware Prompts (V5)
-
-Open and run `final_implementation.ipynb`. This notebook adds:
-- Genre detection heuristic (keyword-based)
-- Genre-aware prompt override for hip-hop/rap content
-- Negative prompting to suppress text hallucinations
-- SDXL for 1024×1024 output
+`evaluation/human_study/preferences.csv` contains the raw forced-choice
+responses from all 56 participants (genre, selected version, no PII collected).
+Analysis scripts reproducing Tables 4–5 and all statistical tests are in
+`evaluation/human_study/analysis.py`.
 
 ---
 
-## Generated Outputs
+## Fixed Seeds and Reproducibility
 
-All 15 generated images are stored in `generated_outputs/`.
+All generation, evaluation, and statistical analysis use `seed=42` unless
+otherwise noted. Model version strings:
 
-| Version | Sad | Pop | Rap |
-|---|---|---|---|
-| V1 | Lone figure, umbrella, foggy park | Colorful figure mid-leap | Plain brown texture (RAKE failure) |
-| V2 | Blurry silhouette in fog | Black-and-white rainy alleyway ⚠️ | Horror-style face ⚠️ |
-| V3 | Teal/magenta face close-up | Warm orange/teal illustration | Graffiti silhouette |
-| V4 | Figure in illuminated corridor ✓ | Vibrant woman, light explosions ✓ | Dramatic figure between rock formations |
-| V5 | Solitary figure, violet fog, streetlamp ✓ | Woman in confetti, golden-hour sunset ✓ | Figure overlooking city skyline at sunset ✓ |
-
-⚠️ = documented failure mode · ✓ = preferred by plurality of evaluators
-
----
-
-## Pipeline Details
-
-### Custom Emotion-Aware Stopword List
-
-Standard NLTK stopwords remove 179 tokens including emotionally critical words. Our custom list retains 47 of these, including:
-
-`hurt · fear · love · lost · pain · dark · light · fall · shadow · cry · dream · night · hope · down · through · away · still · ever · never · always`
-
-### Keyword Extraction
-
-```
-TF-IDF score + (2× multiplier if token in emotion anchor list)
-→ merge and deduplicate
-→ top 7 terms passed to prompt builder
-```
-
-Emotion anchor list: `hurt, fear, love, hate, sad, happy, cry, pain, joy, lost, dark, light, night, dream`
-
-### Emotion-to-Palette Mapping (V3+)
-
-| Emotion | Visual Palette |
+| Component | Version string |
 |---|---|
-| Sadness | Deep blues and purples |
-| Joy | Warm brightness, golden tones |
-| Anger | Reds and oranges |
-| Fear | Desaturated greys, cold blues |
-| Neutral | Muted earth tones |
-
-### SD v1.5 Generation Config (Program 1)
-
-| Parameter | Value | Notes |
-|---|---|---|
-| Inference steps | 30 | 15 = artifacts; 50 = marginal gain |
-| Guidance scale | 7.5 | >10 = oversaturation; <6 = off-prompt |
-| Seed | 42 | Fixed across all runs for reproducibility |
-| Resolution | 512×512 | |
-| Attention slicing | Enabled | ~40% memory reduction for CPU |
+| SD v1.5 | `runwayml/stable-diffusion-v1-5` |
+| SDXL | `stabilityai/stable-diffusion-xl-base-1.0` |
+| Emotion classifier | `j-hartmann/emotion-english-distilroberta-base` |
+| CLIP | `openai/clip-vit-base-patch32` |
 
 ---
 
-## Failure Documentation
+## Citation
 
-This project deliberately documents all failures. Notable failure modes:
-
-**Stopword failure:** Standard NLTK on sad lyrics returned `figure somehow` and `rise`, missing `darkness`, `shadow`, `memories`, `tears`.
-
-**RAKE failure:** Phrase-level scoring on rap lyrics returned `ever seem`.
-
-**Emotion misclassification:** `j-hartmann` model predicts `fear` (0.331) for hip-hop lyrics about urban ambition. Root cause: model trained on Twitter/Reddit/news captions; hip-hop bravado is out-of-distribution.
-
-**V2 style conflict:** Adding `"cinematic, dramatic, high contrast"` style descriptors to pop lyrics overrode the 0.980-confidence joy signal, producing a black-and-white rainy alleyway.
-
-**SD v1.5 text hallucinations:** Garbled text appeared in nearly all SD v1.5 outputs. Addressed in V5 via SDXL + negative prompting.
-
----
-
-## License
-
-MIT License. See `LICENSE` for details.
+Anonymous submission — citation information will be added upon publication.
