@@ -1,4 +1,3 @@
-````markdown
 # Lyric-to-Album-Cover: Modular NLP + Diffusion Pipeline
 
 Code and evaluation artifacts for the paper:
@@ -92,4 +91,3 @@ All generation and evaluation use `seed=42` throughout. Model version strings:
 ## Citation
 
 Anonymous submission — citation information will be added upon publication.
-````
