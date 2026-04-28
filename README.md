@@ -1,8 +1,6 @@
 # Translating Musical Emotion into Visual Form
 ### An Iterative NLP and Generative AI Pipeline for Lyric-to-Album-Cover Synthesis
 
-**Aarush Kandukoori · Vikram Oberai · Karthik Murugan · Jai Nukala**  
-Carnegie Mellon University · 10-335 Art and Machine Learning · Prof. Eunsu Kang · 2026
 
 ---
 
@@ -192,21 +190,6 @@ This project deliberately documents all failures. Notable failure modes:
 **V2 style conflict:** Adding `"cinematic, dramatic, high contrast"` style descriptors to pop lyrics overrode the 0.980-confidence joy signal, producing a black-and-white rainy alleyway.
 
 **SD v1.5 text hallucinations:** Garbled text appeared in nearly all SD v1.5 outputs. Addressed in V5 via SDXL + negative prompting.
-
----
-
-## Citation
-
-If you use this work, please cite:
-
-```bibtex
-@article{kandukoori2026lyrics,
-  title={Translating Musical Emotion into Visual Form: An Iterative NLP and Generative AI Pipeline for Lyric-to-Album-Cover Synthesis},
-  author={Kandukoori, Aarush and Oberai, Vikram and Murugan, Karthik and Nukala, Jai},
-  institution={Carnegie Mellon University},
-  year={2026}
-}
-```
 
 ---
 
