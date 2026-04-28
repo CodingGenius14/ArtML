@@ -1,3 +1,4 @@
+````markdown
 # Lyric-to-Album-Cover: Modular NLP + Diffusion Pipeline
 
 Code and evaluation artifacts for the paper:
@@ -21,35 +22,16 @@ An end-to-end pipeline that takes song lyrics as input and generates album cover
 
 ## Repo Structure
 
-    ├── program1/               # SD v1.5 pipeline (produces V1–V4)
-    ├── program2/               # SDXL pipeline with genre-aware override (produces V5)
-    ├── evaluation/
-    │   ├── clip_eval.ipynb     # CLIP-prompt and CLIP-lyric scoring
-    │   └── human_study/        # Preference data (CSV) and analysis scripts
-    ├── outputs/
-    │   ├── rap/                # Generated images V1–V5, rap genre
-    │   ├── sad/                # Generated images V1–V5, sad/introspective genre
-    │   └── pop/                # Generated images V1–V5, upbeat pop genre
-    └── figures/                # All paper figures (PDF + PNG)
+    ├── main.ipynb                  # Program 1: SD v1.5 pipeline (produces V1–V4)
+    ├── improved_main.ipynb         # Program 2: SDXL pipeline with genre-aware override (produces V5)
+    ├── final_implementation.ipynb  # CLIP evaluation and scoring
+    ├── generated_outputs/          # All 15 generated images (V1–V5 × 3 genres)
+    ├── album_cover.png             # Sample output
+    └── requirements.txt
 
 ---
 
 ## Requirements
-
-```
-torch
-transformers
-diffusers
-accelerate
-Pillow
-nltk
-scikit-learn
-numpy
-pandas
-matplotlib
-```
-
-Install with:
 
 ```bash
 pip install -r requirements.txt
@@ -68,42 +50,35 @@ nltk.download('punkt')
 
 ## Reproducing the Main Results
 
-**Generate images (Program 1 — SD v1.5, V1–V4):**
+**Program 1 — SD v1.5, produces V1–V4:**
 
-```bash
-cd program1
-python generate.py --genre sad --version v4 --seed 42
-```
+Open and run `main.ipynb`. Runs on CPU (no GPU required, ~15 min/image). All cells use fixed `seed=42`.
 
-**Generate images (Program 2 — SDXL, V5):**
+**Program 2 — SDXL with genre-aware override, produces V5:**
 
-```bash
-cd program2
-python generate_sdxl.py --genre rap --seed 42
-```
-
-All experiments use `--seed 42` throughout. V1–V4 run on CPU (no GPU required, ~15 min/image). V5 requires a GPU with ≥16GB VRAM.
+Open and run `improved_main.ipynb`. Requires a GPU with ≥16GB VRAM.
 
 **CLIP evaluation:**
 
-```bash
-cd evaluation
-jupyter nbconvert --to notebook --execute clip_eval.ipynb
-```
-
-Scores are written to `evaluation/clip_scores.csv` and match Table 6 in the paper.
+Open and run `final_implementation.ipynb`. Upload the 15 generated images from `generated_outputs/` when prompted. Outputs CLIP-prompt similarity scores matching Table 6 in the paper.
 
 ---
 
-## Human Preference Data
+## Generated Outputs
 
-`evaluation/human_study/preferences.csv` contains the raw forced-choice responses from all 56 participants (genre, selected version, no PII collected). Analysis scripts reproducing Tables 4–5 and all statistical tests are in `evaluation/human_study/analysis.py`.
+`generated_outputs/` contains all 15 images organized by genre and pipeline version:
+
+| File | Genre | Version |
+|---|---|---|
+| `sad_introspective_v1.png` – `sad_v5.png` | Sad / Introspective | V1–V5 |
+| `upbeat_pop_v1.png` – `pop_v5.png` | Upbeat Pop | V1–V5 |
+| `rap_v1.png` – `rap_v5.png` | Rap / Ambition | V1–V5 |
 
 ---
 
 ## Fixed Seeds and Reproducibility
 
-All generation, evaluation, and statistical analysis use `seed=42` unless otherwise noted. Model version strings:
+All generation and evaluation use `seed=42` throughout. Model version strings:
 
 | Component | Version string |
 |---|---|
@@ -117,3 +92,4 @@ All generation, evaluation, and statistical analysis use `seed=42` unless otherw
 ## Citation
 
 Anonymous submission — citation information will be added upon publication.
+````
