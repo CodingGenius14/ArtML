@@ -20,20 +20,23 @@ An end-to-end pipeline that takes song lyrics as input and generates album cover
 ---
 
 ## Repo Structure
-├── program1/               # SD v1.5 pipeline (produces V1–V4)
-├── program2/               # SDXL pipeline with genre-aware override (produces V5)
-├── evaluation/
-│   ├── clip_eval.ipynb     # CLIP-prompt and CLIP-lyric scoring
-│   └── human_study/        # Preference data (CSV) and analysis scripts
-├── outputs/
-│   ├── rap/                # Generated images V1–V5, rap genre
-│   ├── sad/                # Generated images V1–V5, sad/introspective genre
-│   └── pop/                # Generated images V1–V5, upbeat pop genre
-└── figures/                # All paper figures (PDF + PNG)
+
+    ├── program1/               # SD v1.5 pipeline (produces V1–V4)
+    ├── program2/               # SDXL pipeline with genre-aware override (produces V5)
+    ├── evaluation/
+    │   ├── clip_eval.ipynb     # CLIP-prompt and CLIP-lyric scoring
+    │   └── human_study/        # Preference data (CSV) and analysis scripts
+    ├── outputs/
+    │   ├── rap/                # Generated images V1–V5, rap genre
+    │   ├── sad/                # Generated images V1–V5, sad/introspective genre
+    │   └── pop/                # Generated images V1–V5, upbeat pop genre
+    └── figures/                # All paper figures (PDF + PNG)
 
 ---
 
 ## Requirements
+
+```
 torch
 transformers
 diffusers
@@ -44,6 +47,7 @@ scikit-learn
 numpy
 pandas
 matplotlib
+```
 
 Install with:
 
