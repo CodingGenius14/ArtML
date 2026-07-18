@@ -58,16 +58,15 @@ the paper and figures as follows:
 
 | Genre (paper label) | V1 | V2 | V3 | V4 | V5 |
 | --- | --- | --- | --- | --- | --- |
-| Sad / Introspective | `sad_introspective_v1.png` | `sad_introspective_v2.png` | `sad_introspective_v3.png` | `sad_introspective_v4.png` | `sad_v5.png` — **not yet committed** |
-| Upbeat Pop | `upbeat_pop_v1.png` | `upbeat_pop_v2.png` | `upbeat_pop_v3.png` | `upbeat_pop_v4.png` | `pop_v5.png` — **not yet committed** |
-| Rap / Ambition | `rap_v1.png` | `rap_v2.png` | `rap_v3.png` | `rap_v4.png` | `rap_v5.png` — **not yet committed** |
+| Sad / Introspective | `sad_introspective_v1.png` | `sad_introspective_v2.png` | `sad_introspective_v3.png` | `sad_introspective_v4.png` | `sad_v5.png` |
+| Upbeat Pop | `upbeat_pop_v1.png` | `upbeat_pop_v2.png` | `upbeat_pop_v3.png` | `upbeat_pop_v4.png` | `pop_v5.png` |
+| Rap / Ambition | `rap_v1.png` | `rap_v2.png` | `rap_v3.png` | `rap_v4.png` | `rap_v5.png` |
 
-V1–V4 (SD v1.5, from `main.ipynb`) are present and follow the
-`{genre}_v{n}.png` convention. The three V5 covers (SDXL + genre override, from
-`improved_main.ipynb`) are referenced by the paper and by
-`analysis/clip_eval.py` but are not yet in `generated_outputs/`; the V5
-filenames use the shortened `{sad,pop,rap}_v5.png` form expected by the CLIP
-evaluation script. Add those three files to complete the 15-cover set.
+All 15 covers are present. V1–V4 (SD v1.5, from `main.ipynb`) are 512×512. The
+three V5 covers (SDXL + genre override, from `improved_main.ipynb`) use the
+shortened `{sad,pop,rap}_v5.png` filenames expected by `analysis/clip_eval.py`.
+The committed V5 PNGs are 548×548 exports; regenerate from `improved_main.ipynb`
+for the full 1024×1024 resolution described under "Generation configuration".
 
 ## Reproducing the statistics
 
